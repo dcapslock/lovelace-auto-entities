@@ -51,6 +51,7 @@ export interface AutoEntitiesConfig {
   card_param?: string;
 
   show_empty?: boolean;
+  show_error?: boolean;
   else?: any;
   unique?: boolean | string;
   sort?: any;
@@ -66,6 +67,7 @@ export interface LovelaceCard extends HTMLElement {
   hass: any;
   setConfig(config: any): void;
   getCardSize?(): number;
+  preview?: boolean;
 }
 export interface HuiErrorCard extends LovelaceCard {
   _config: any;

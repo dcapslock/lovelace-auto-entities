@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import {
   hasTemplate,
@@ -10,7 +10,6 @@ import { get_sorter } from "./sort";
 import {
   AutoEntitiesConfig,
   EntityList,
-  HuiErrorCard,
   LovelaceCard,
   LovelaceRowConfig,
 } from "./types";
@@ -32,6 +31,7 @@ class AutoEntities extends LitElement {
   @property() card: LovelaceCard;
   @property() else?: LovelaceCard;
   @property() _template: string[];
+  @property({ type: Boolean, reflect: true}) preview = false;
   @state() empty = false;
 
   _entities: EntityList;
@@ -162,7 +162,9 @@ class AutoEntities extends LitElement {
       compare_deep(this._cardConfig, this._config.card)
     )
       return;
-    const newType = this._cardConfig?.type !== this._config.card?.type;
+    const newType =
+      (this._cardConfig?.type !== this._config.card?.type) ||
+      (this.card?.localName === "hui-error-card");
     this._entities = entities;
     this._cardConfig = JSON.parse(JSON.stringify(this._config.card ?? {}));
     const cardEntities = (entities.length > 0) ? 
@@ -175,9 +177,11 @@ class AutoEntities extends LitElement {
     };
     if (!this.card || newType) {
       const helpers = await (window as any).loadCardHelpers();
-      this.card = await helpers.createCardElement(cardConfig);
+      const card = await helpers.createCardElement(cardConfig);
+      card.preview = this.preview;
+      this.card = card;
     } else {
-      this.card.setConfig(cardConfig);
+      this.card.setConfig(cardConfig); 
     }
 
     this._cardBuiltResolve?.();
@@ -302,16 +306,22 @@ class AutoEntities extends LitElement {
     ) {
       queueMicrotask(() => this.update_all());
     }
+    if (changedProperties.has("preview") && this.card) {
+      this.card.preview = this.preview;
+    }
   }
 
   createRenderRoot() {
     return this;
   }
   render() {
-    return html`${this.empty &&
-    (this._config.show_empty === false || this._config.else)
+    const shouldShowEmpty = this._config.show_empty === false; 
+    const shouldRender = this.card?.localName !== "hui-error-card" || this._config.show_error !== false || this.preview;
+    return html`${this.empty && (shouldShowEmpty || this._config.else)
       ? this.else
-      : this.card}`;
+      : shouldRender
+        ? this.card
+        : nothing}`;
   }
 
   async getCardSize() {
