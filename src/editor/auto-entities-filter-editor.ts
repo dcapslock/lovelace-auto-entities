@@ -17,6 +17,8 @@ class AutoEntitiesFilterEditor extends LitElement {
   @state() _config: AutoEntitiesConfig;
   @property() hass;
 
+  private _newStyleButton = false;
+
   _describe_filter(filter) {
     if ("type" in filter) {
       return `${filter.type} ${filter.label ? `"${filter.label}"` : ""}`;
@@ -144,6 +146,11 @@ class AutoEntitiesFilterEditor extends LitElement {
       );
       (fold as any).expanded = true;
     });
+
+    const [haMajor, haMinor, haPatch] = this.hass?.config?.version.split(".", 3);
+    if ((haMajor >= 2025 && haMinor >= 8) || haMajor > 2025) {
+      this._newStyleButton = true;
+    }
   }
 
   updated(changedProperties) {
