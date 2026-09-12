@@ -239,27 +239,6 @@ class AutoEntitiesFilterEditor extends LitElement {
                             </ha-form>
                           </div>
                         </ha-expansion-panel>
-                        ${type === "include"
-                          ? html`
-                              <ha-expansion-panel outlined class="styling">
-                                <h4 slot="header">Styling</h4>
-                                <div class="content">
-                                  <ha-form
-                                    .hass=${this.hass}
-                                    .schema=${stylingSchema}
-                                    .data=${{
-                                      uix_entity_icon_styling:
-                                        filter.uix_entity_icon_styling === true,
-                                    }}
-                                    .computeLabel=${(s) => s.label ?? s.name}
-                                    @value-changed=${(ev) =>
-                                      this._stylingChanged(ev, idx, type)}
-                                  >
-                                  </ha-form>
-                                </div>
-                              </ha-expansion-panel>
-                            `
-                          : ""}
                       `
                     : html`
                         <ha-form
@@ -272,6 +251,27 @@ class AutoEntitiesFilterEditor extends LitElement {
                         >
                         </ha-form>
                       `}
+                  ${type === "include"
+                    ? html`
+                        <ha-expansion-panel outlined class="styling">
+                          <h4 slot="header">Styling</h4>
+                          <div class="content">
+                            <ha-form
+                              .hass=${this.hass}
+                              .schema=${stylingSchema}
+                              .data=${{
+                                uix_entity_icon_styling:
+                                  filter.uix_entity_icon_styling === true,
+                              }}
+                              .computeLabel=${(s) => s.label ?? s.name}
+                              @value-changed=${(ev) =>
+                                this._stylingChanged(ev, idx, type)}
+                            >
+                            </ha-form>
+                          </div>
+                        </ha-expansion-panel>
+                      `
+                    : ""}
                 </div>
               </ha-expansion-panel>
             `
